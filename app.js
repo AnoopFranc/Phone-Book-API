@@ -31,10 +31,10 @@ app.use(express.json());
 
 //route
 app.use('/user',userRoutes);
-
+// stored in enviornment variable
 const port =process.env.PORT || 3000; 
 
-const uri = 'mongodb+srv://anoop:1234567890@phonebook-pjs68.mongodb.net/test?retryWrites=true&w=majority';
+const uri = process.env.DB_CONNECTION ;
 
 mongoose.connect(uri, {useNewUrlParser: true}).then(() => {
     console.log("DB Connection successful");

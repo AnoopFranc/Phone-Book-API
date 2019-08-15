@@ -1,5 +1,4 @@
 const User = require('../models/contacts');
-
 exports.Register = async (req,res,next) => {
     let name = req.body.name;
     let email = req.body.email;
@@ -13,6 +12,7 @@ exports.Register = async (req,res,next) => {
             phone: phone
         })
         await user.save();
+        //creates jwt token
         const token = await user.createToken();
         res.status(201).send({user:user,token:token});
     } catch (error) {
@@ -24,10 +24,19 @@ exports.Register = async (req,res,next) => {
 }
 
 exports.Login = async (req, res,next) => {
+  
     try {
-        const user = await User.findByCredentials(req.body.email, req.body.password)
-        res.send({ user: user })
+        //calling satatic method of matching credentials
+        const match = await User.findByCredentials(req.body.email,req.body.password)
+        if(match){
+            //returns other registered contacts without the password and token field as an array
+            const users = await User.find({_id: { $ne: req.user._id }}).select('-password').select('-tokens');
+            res.status(201).send({ users: users })
+        }
+        else{
+            throw new Error();
+        }
     } catch (e) {
-        res.status(400).send()
+        res.status(400).send({message: e.message})
     }
 }
