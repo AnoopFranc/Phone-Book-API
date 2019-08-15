@@ -24,13 +24,23 @@ exports.Register = async (req,res,next) => {
 }
 
 exports.Login = async (req, res,next) => {
-  
+    
     try {
         //calling satatic method of matching credentials
         const match = await User.findByCredentials(req.body.email,req.body.password)
         if(match){
             //returns other registered contacts without the password and token field as an array
-            const users = await User.find({_id: { $ne: req.user._id }}).select('-password').select('-tokens');
+            //select excludes the fields specified
+            //limit limits results currently 2 customize it with query
+            //sort for sorting according to name
+            const users = await User.find({_id: { $ne: req.user._id }})
+            .select('-password')
+            .select('-tokens')
+            .limit(2)
+            .skip(parseInt(req.query.skip))
+            .sort({name:1});
+
+            
             res.status(201).send({ users: users })
         }
         else{
