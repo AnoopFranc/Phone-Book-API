@@ -6,7 +6,6 @@ require('dotenv/config');
 const app = express();
 
 //importing routes
-const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 
 
@@ -28,14 +27,14 @@ app.use(function (req, res, next) {
 // x-www-form-urlencoded data
 app.use(express.json());
 
-app.use(expres.urlencoded({extended:true}));
+//app.use(express.urlencoded({extended:true}));
 
 //route
 app.use('/user',userRoutes);
 
 const port =process.env.PORT || 3000; 
 
-const uri = process.env.DB_CONNECTION;
+const uri = 'mongodb+srv://anoop:1234567890@phonebook-pjs68.mongodb.net/test?retryWrites=true&w=majority';
 
 mongoose.connect(uri, {useNewUrlParser: true}).then(() => {
     console.log("DB Connection successful");
@@ -44,5 +43,5 @@ mongoose.connect(uri, {useNewUrlParser: true}).then(() => {
     });
 })
 .catch(err => {
-  console.log(err);
+  console.log(err.message);
 })

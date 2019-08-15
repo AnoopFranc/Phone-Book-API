@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-//importing validator module for validation
+//importing validator module for validation and authentication
 const validator = require('validator'); 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -23,7 +23,18 @@ let userSchema = new Schema({
             }
         }
     },
-    phone: String,
+    password: {
+        type: String,
+        required: true,
+        minlength: 7,
+        trim: true
+    },
+    phone: Number,
+    tokens: [{token: {
+        type: String,
+        required: true
+    }
+}]
 });
 
 //methods are used for accessing instances
@@ -31,7 +42,37 @@ let userSchema = new Schema({
 userSchema.methods.createToken = async function ()  {
     let user = this; 
     let token = jwt.sign({_id: user._id.toString()}, process.env.SECRET);
+    user.tokens = user.tokens.concat({token});
+    await user.save();
+    return token;
 }
+// for matching login credentials declared static for accesing the model
+userSchema.statics.findByCredentials = async (email, password) => {
+    const user = await User.findOne({ email })
+
+    if (!user) {
+        throw new Error('Unable to login')
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password)
+
+    if (!isMatch) {
+        throw new Error('Unable to login')
+    }
+
+    return user
+}
+
+// Hash the plain text password before saving using bcyrpt 
+userSchema.pre('save', async function (next) {
+    const user = this
+
+    if (user.isModified('password')) {
+        user.password = await bcrypt.hash(user.password, 8)
+    }
+
+    next()
+})
 
 // Export Contact model
 module.exports = mongoose.model('user',userSchema);
