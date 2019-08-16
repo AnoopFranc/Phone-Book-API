@@ -14,5 +14,10 @@ DB_CONNECTION = mongodb://mongodb0.example.com:27017/admin || copy the uri strin
 npm run dev
 
 fire you request in postman with end point:
-http://localhost:3000/user/register
-http://localhost:3000/user/login
+http://localhost:3000/user/register, 
+http://localhost:3000/user/login with header Authorization key and Bearer <token> for auth
+
+Crud Endpoints For contacts (All require auth middleware mentioned above)
+Post :http://localhost:3000/contact, 
+Get : http://localhost:3000/contacts, 
+Patch: http://localhost:3000/contact/:id parameter
