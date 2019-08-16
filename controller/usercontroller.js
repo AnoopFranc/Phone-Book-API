@@ -1,15 +1,12 @@
-const User = require('../models/contacts');
+const User = require('../models/user');
+
 exports.Register = async (req,res,next) => {
     let name = req.body.name;
-    let email = req.body.email;
     let pass = req.body.password;
-    let phone = req.body.phone;
     try {
         let user = new User({
             name: name,
-            email: email,
             password: pass,
-            phone: phone
         })
         await user.save();
         //creates jwt token
@@ -27,21 +24,25 @@ exports.Login = async (req, res,next) => {
     
     try {
         //calling satatic method of matching credentials
-        const match = await User.findByCredentials(req.body.email,req.body.password)
+        const match = await User.findByCredentials(req.body.name,req.body.password)
         if(match){
             //returns other registered contacts without the password and token field as an array
             //select excludes the fields specified
             //limit limits results currently 2 customize it with query
             //sort for sorting according to name
-            const users = await User.find({_id: { $ne: req.user._id }})
+            const user =  req.user;
+            
+            
+            /* 
+            await User.find({_id: { $ne: req.user._id }})
             .select('-password')
             .select('-tokens')
             .limit(2)
             .skip(parseInt(req.query.skip))
             .sort({name:1});
-
+ */
             
-            res.status(201).send({ users: users })
+            res.status(201).send({message: `logged in as ${req.user.name}` , user: user })
         }
         else{
             throw new Error();

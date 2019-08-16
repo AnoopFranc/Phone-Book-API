@@ -7,6 +7,7 @@ const app = express();
 
 //importing routes
 const userRoutes = require('./routes/user');
+const contactRoutes = require('./routes/contact');
 
 
 
@@ -29,13 +30,14 @@ app.use(express.json());
 
 //app.use(express.urlencoded({extended:true}));
 
-//route
+//routes
 app.use('/user',userRoutes);
+app.use('/',contactRoutes)
 // stored in enviornment variable
 const port =process.env.PORT || 3000; 
+console.log('db is',process.env.DB_CONNECTION)//1234asd
 
-const uri = process.env.DB_CONNECTION ;
-
+const uri = process.env.DB_CONNECTION
 mongoose.connect(uri, {useNewUrlParser: true}).then(() => {
     console.log("DB Connection successful");
     app.listen(port,() => {
@@ -43,5 +45,5 @@ mongoose.connect(uri, {useNewUrlParser: true}).then(() => {
     });
 })
 .catch(err => {
-  console.log(err.message);
+  console.log(err);
 })
